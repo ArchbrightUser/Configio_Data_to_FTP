@@ -25,7 +25,8 @@ def get_url_response(url, local_file):
     payload = {}
     headers = {
       'Content-Type': "application/json",
-      'x-token': "]0Br#bH(r;5FSF^[]YCN;wF1.evyb17}TKg_f6ZB",
+      # Insert Configio API token as a string
+      'x-token': '''API TOKEN HERE''',
     }
     response = requests.request("GET", url, headers=headers, data = payload)
     if response.status_code != 200:
@@ -44,8 +45,9 @@ def update_results_file(file_name, results):
 
 def connect_to_server():
     server = ftplib.FTP()
-    server.connect('160.153.59.102')
-    server.login('marketing@archbright.com', 'Z0]rS]@rB]g}' )
+    # Get IP, Username, Password from 1password.com
+    server.connect(#IP ADDRESS)
+    server.login('''USERNAME, PASSWORD''')
     return server
 
 def transfer_local_file_to_ftp(local_file, ftp_path):
