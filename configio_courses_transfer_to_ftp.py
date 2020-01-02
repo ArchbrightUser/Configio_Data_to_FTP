@@ -46,7 +46,7 @@ def update_results_file(file_name, results):
 def connect_to_server():
     server = ftplib.FTP()
     # Get IP, Username, Password from 1password.com
-    server.connect(#IP ADDRESS)
+    server.connect('''IP ADDRESS''')
     server.login('''USERNAME, PASSWORD''')
     return server
 
