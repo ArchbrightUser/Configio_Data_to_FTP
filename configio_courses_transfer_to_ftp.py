@@ -10,23 +10,21 @@ Created on Wed Nov 20 13:10:33 2019
 import requests
 import json
 from datetime import datetime, timedelta
-import ftplib
-import os
+import pysftp
 
 #==========Configio API==================
 
 def get_course_url():
     startdate = datetime.now().strftime("%m/%d/%Y")
     # timedelta() is the amount of days from todays date
-    enddate = (datetime.now() + timedelta(days=30)).strftime("%m/%d/%Y")
+    enddate = (datetime.now() + timedelta(days=180)).strftime("%m/%d/%Y")
     return f"https://api.configio.com/api/v1/products?startdate={startdate}&enddate={enddate}"
 
 def get_url_response(url, local_file):
     payload = {}
     headers = {
       'Content-Type': "application/json",
-      # Insert Configio API token as a string
-      'x-token': '''API TOKEN HERE''',
+      'x-token': API_TOKEN,
     }
     response = requests.request("GET", url, headers=headers, data = payload)
     if response.status_code != 200:
@@ -41,34 +39,26 @@ def update_results_file(file_name, results):
         json.dump(results, connection_file)
 
     
-#==========FTP===========
-
-def connect_to_server():
-    server = ftplib.FTP()
-    # Get IP, Username, Password from 1password.com
-    server.connect('''IP ADDRESS''')
-    server.login('''USERNAME, PASSWORD''')
-    return server
+#============SFTP==============
 
 def transfer_local_file_to_ftp(local_file, ftp_path):
     # create local file
     get_url_response(get_course_url(), local_file)
     
     # connect to server
-    server = connect_to_server()
-    server.cwd(ftp_path)
+    cnopts = pysftp.CnOpts(knownhosts='~/.ssh/authorized_keys')
+    cnopts.hostkeys = None
     
-    # transfer the local file to server
-    with open(local_file, 'rb') as f:
-        server.storbinary(f'STOR {os.path.basename(local_file)}', f, 1024)
-        f.close()
+    with pysftp.Connection(IP_ADDRESS, username=USERNAME, private_key=KEY_PATH_TO_KEY, private_key_pass=PASSWORD, cnopts=cnopts) as server:
+        server.chdir(ftp_path)
+        server.put(local_file)
     
-    # close connection
-    server.quit()
+        # close connection
+        server.close()
 
 
+# RUN!
+transfer_local_file_to_ftp('//we.local/corp/IT/App_Prod/SQL/Python/configio_api.php', 'public_html/svy/wp-connection')
 
-transfer_local_file_to_ftp('//we.local/corp/IT/App_Prod/SQL/Python/configio_api.php', 'svy/wp-connection')
-    
 
 # to display json to php: https://www.taniarascia.com/how-to-use-json-data-with-php-or-javascript/
