@@ -57,7 +57,7 @@ def transfer_local_file_to_ftp(local_file, ftp_path):
         server.close()
 
 
-# RUN!
+# Choose path to save locally and transfer to sftp server
 transfer_local_file_to_ftp('//we.local/corp/IT/App_Prod/SQL/Python/configio_api.php', 'public_html/svy/wp-connection')
 
 
